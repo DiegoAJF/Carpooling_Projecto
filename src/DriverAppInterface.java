@@ -138,7 +138,16 @@ public class DriverAppInterface extends JFrame {
 
                     // Muestra el mensaje de resultado en la interfaz
                     if ("Login successful".equals(response)) {
-                        JOptionPane.showMessageDialog(DriverAppInterface.this, "Login successful!");
+                        // Abre la nueva interfaz
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                new EmployeeApp(username).setVisible(true);
+                            }
+                        });
+
+                        // Cierra la interfaz actual
+                        dispose();
                     } else {
                         JOptionPane.showMessageDialog(DriverAppInterface.this, "Login failed. Please check your credentials.");
                     }

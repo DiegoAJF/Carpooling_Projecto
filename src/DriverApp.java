@@ -3,10 +3,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class EmployeeApp extends JFrame {
+public class DriverApp extends JFrame {
     private JComboBox<String> transportationComboBox;
 
-    public EmployeeApp(String username) {
+    public DriverApp(String username) {
         setTitle("Welcome, " + username + "!");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,7 +29,7 @@ public class EmployeeApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Lógica para visualizar la calificación promedio
-                JOptionPane.showMessageDialog(EmployeeApp.this, "Viewing Average Rating");
+                JOptionPane.showMessageDialog(DriverApp.this, "Viewing Average Rating");
             }
         });
 
@@ -39,7 +39,7 @@ public class EmployeeApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Lógica para visualizar relaciones de amistad con conductores
-                JOptionPane.showMessageDialog(EmployeeApp.this, "Viewing Friendships with Drivers");
+                JOptionPane.showMessageDialog(DriverApp.this, "Viewing Friendships with Drivers");
             }
         });
 

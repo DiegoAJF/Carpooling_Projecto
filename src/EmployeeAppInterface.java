@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.Socket;
 import java.io.BufferedWriter;
 import java.io.IOException;
+
 public class EmployeeAppInterface extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -14,7 +15,7 @@ public class EmployeeAppInterface extends JFrame {
 
     public EmployeeAppInterface() {
         // Configuración de la interfaz
-        setTitle("EmployeeApp Login and Registration");
+        setTitle("EmployeeApp");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
@@ -105,14 +106,46 @@ public class EmployeeAppInterface extends JFrame {
             }
         });
 
-
-        // Acción del botón de inicio de sesión
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Lógica para el inicio de sesión aquí
-                // Puedes obtener los valores de los campos usando usernameField.getText(), passwordField.getPassword(), etc.
-                // Implementa la lógica para verificar la información en el servidor.
+                // Obtén los valores de los campos
+                String username = usernameField.getText();
+                char[] passwordChars = passwordField.getPassword();
+                String password = new String(passwordChars);
+
+                // Crea un objeto JSON con la información de inicio de sesión
+                JSONObject loginData = new JSONObject();
+                loginData.put("username", username);
+                loginData.put("password", password);
+
+                try (Socket socket = new Socket("localhost", 12345);
+                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+                ) {
+                    // Indica al servidor que la operación es de inicio de sesión
+                    writer.write("LOGIN");
+                    writer.newLine();
+
+                    // Envía el JSON al servidor
+                    writer.write(loginData.toString());
+                    writer.newLine();
+                    writer.flush();
+
+                    // Lee la respuesta del servidor
+                    String response = reader.readLine();
+
+                    // Muestra el mensaje de resultado en la interfaz
+                    if ("Login successful".equals(response)) {
+                        JOptionPane.showMessageDialog(EmployeeAppInterface.this, "Login successful!");
+                    } else {
+                        JOptionPane.showMessageDialog(EmployeeAppInterface.this, "Login failed. Please check your credentials.");
+                    }
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    // Aquí puedes manejar la excepción según tus necesidades
+                }
             }
         });
     }

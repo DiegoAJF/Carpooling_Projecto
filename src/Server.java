@@ -96,7 +96,7 @@ public class Server {
                 JSONObject userData = XML.toJSONObject(xmlData);
 
                 String storedUsername = userData.getString("username");
-                String storedPassword = userData.getString("password");
+                String storedPassword = userData.get("password").toString(); // Convierte el valor a cadena
 
                 return username.equals(storedUsername) && password.equals(storedPassword);
             } else {

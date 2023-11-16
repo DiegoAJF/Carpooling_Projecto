@@ -137,7 +137,16 @@ public class EmployeeAppInterface extends JFrame {
 
                     // Muestra el mensaje de resultado en la interfaz
                     if ("Login successful".equals(response)) {
-                        JOptionPane.showMessageDialog(EmployeeAppInterface.this, "Login successful!");
+                        // Abre la nueva interfaz
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                new EmployeeApp(username).setVisible(true);
+                            }
+                        });
+
+                        // Cierra la interfaz actual
+                        dispose();
                     } else {
                         JOptionPane.showMessageDialog(EmployeeAppInterface.this, "Login failed. Please check your credentials.");
                     }
@@ -148,6 +157,7 @@ public class EmployeeAppInterface extends JFrame {
                 }
             }
         });
+
     }
 
     public static void main(String[] args) {

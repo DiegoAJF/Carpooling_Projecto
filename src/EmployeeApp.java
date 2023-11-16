@@ -1,13 +1,24 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.json.XML;
-import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class EmployeeApp extends JFrame {
     private JComboBox<String> transportationComboBox;
@@ -73,46 +84,50 @@ public class EmployeeApp extends JFrame {
     public String getTransportationOption() {
         return (String) transportationComboBox.getSelectedItem();
     }
+// Dentro de la clase EmployeeApp
+
+    // Dentro de la clase EmployeeApp
     private void viewDriverFriendships() {
-        // Obtener el nombre de usuario del empleado actual
-        String employeeUsername = "EmpleadoEjemplo";  // Reemplaza con el nombre de usuario real
-
-        // Obtener y mostrar las amistades con conductores
-        String friendships = getDriverFriendships(employeeUsername);
-        JOptionPane.showMessageDialog(EmployeeApp.this, "Friendships with Drivers:\n" + friendships);
-    }
-
-    // Agregar un método para obtener las amistades con conductores
-    private String getDriverFriendships(String employeeUsername) {
-        try {
-            String fileName = employeeUsername + "_friendships.xml";
-            File file = new File(fileName);
-
-            // Verificar si el archivo existe
-            if (file.exists()) {
-                // Lee el contenido del archivo XML
-                String xmlData = new String(readFileContents(file));
-                JSONObject friendshipsData = XML.toJSONObject(xmlData);
-
-                // Extraer y formatear las amistades con conductores
-                StringBuilder friendshipsStringBuilder = new StringBuilder();
-                friendshipsStringBuilder.append("Driver\tStatus\n");
-
-                JSONObject friendships = friendshipsData.getJSONObject("friendships");
-                for (String driver : friendships.keySet()) {
-                    String status = friendships.getString(driver);
-                    friendshipsStringBuilder.append(driver).append("\t").append(status).append("\n");
-                }
-
-                return friendshipsStringBuilder.toString();
-            } else {
-                return "No friendships with drivers found.";
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Error retrieving friendships with drivers.";
+        // Lógica para obtener y mostrar las amistades con conductores
+        List<String> driverFriendships = getDriverFriendshipsWithDetails();  // Obtener detalles de las amistades con conductores
+        if (!driverFriendships.isEmpty()) {
+            // Si hay conductores amigos, mostrar en un cuadro de diálogo
+            String message = "Friendships with Drivers:\n" + String.join("\n", driverFriendships);
+            JOptionPane.showMessageDialog(EmployeeApp.this, message);
+        } else {
+            JOptionPane.showMessageDialog(EmployeeApp.this, "No friendships with drivers.");
         }
     }
+
+    // Agregar un método para obtener los detalles de las amistades con conductores
+    private List<String> getDriverFriendshipsWithDetails() {
+        // Lógica para obtener los detalles de las amistades con conductores desde el archivo XML
+        List<String> driverFriendships = new ArrayList<>();
+
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("friendships.xml"));
+
+            NodeList friendshipNodes = doc.getElementsByTagName("friendship");
+            for (int i = 0; i < friendshipNodes.getLength(); i++) {
+                Node friendshipNode = friendshipNodes.item(i);
+                if (friendshipNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element friendshipElement = (Element) friendshipNode;
+                    String friend = friendshipElement.getElementsByTagName("friend").item(0).getTextContent();
+                    String requestDetails = friendshipElement.getElementsByTagName("requestDetails").item(0).getTextContent();
+                    // Agregar el nombre del amigo y detalles de la solicitud a la lista
+                    driverFriendships.add(friend + " - Request Details: " + requestDetails);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Manejar la excepción según tus necesidades
+        }
+
+        return driverFriendships;
+    }
+
 
     // Agregar un método para leer el contenido de un archivo
     private static String readFileContents(File file) throws IOException {

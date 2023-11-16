@@ -3,10 +3,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import org.json.JSONObject;
 import org.json.XML;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Server {
@@ -30,6 +39,8 @@ public class Server {
         }
     }
 
+    // Reemplaza el método handleFriendRequest con este código:
+
     private static void handleFriendRequest(BufferedReader reader, BufferedWriter writer) throws IOException {
         // Lógica para manejar la solicitud de amistad
         String jsonFriendRequestData = reader.readLine();
@@ -38,18 +49,88 @@ public class Server {
         // Obtener los campos del JSON
         String driverUsername = friendRequestData.getString("driverUsername");
         String friendUsername = friendRequestData.getString("friendUsername");
+        String requestDetails = friendRequestData.optString("requestDetails", "");  // Obtener detalles (puede ser una cadena vacía)
 
         // Verificar la solicitud de amistad y enviar la respuesta al cliente
         if (checkUserExists(driverUsername) && checkUserExists(friendUsername)) {
-            // Aquí puedes implementar la lógica para almacenar la relación de amistad
-            // Puedes guardar esta información en un archivo XML o en otro formato según tus necesidades
-            // Por ahora, simplemente enviamos una respuesta al cliente
+            // Almacenar la información de la solicitud en un archivo XML
+            storeFriendshipRequest(driverUsername, friendUsername, requestDetails);
+
             writer.write("Friend request sent to " + friendUsername);
         } else {
             writer.write("User not found: " + friendUsername);
         }
         writer.newLine();
         writer.flush();
+    }
+
+    // Agregar este nuevo método para almacenar la solicitud de amistad en un archivo XML
+    private static void storeFriendshipRequest(String driverUsername, String friendUsername, String requestDetails) {
+        try (FileWriter writer = new FileWriter("friendship_requests.xml", true)) {
+            // Formato XML para almacenar las solicitudes de amistad con detalles
+            String xmlData = String.format(
+                    "<friendship_request><driver>%s</driver><friend>%s</friend><requestDetails>%s</requestDetails></friendship_request>%n",
+                    driverUsername, friendUsername, requestDetails);
+
+            // Escribir la información en el archivo
+            writer.write(xmlData);
+            System.out.println(driverUsername + " sent a friend request to " + friendUsername);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Manejar la excepción según tus necesidades
+        }
+    }
+
+// Modificar el método getDriverFriendshipsWithDetails con este código:
+
+    private static List<String> getDriverFriendshipsWithDetails(String driverUsername) {
+        // Lógica para obtener las solicitudes y relaciones de amistad con detalles desde el archivo XML
+        List<String> driverFriendships = new ArrayList<>();
+
+        try {
+            // Obtener las solicitudes de amistad
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = ((DocumentBuilder) builder).parse(new File("friendship_requests.xml"));
+
+            NodeList requestNodes = doc.getElementsByTagName("friendship_request");
+            for (int i = 0; i < ((NodeList) requestNodes).getLength(); i++) {
+                Node requestNode = requestNodes.item(i);
+                if (requestNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element requestElement = (Element) requestNode;
+                    String friend = requestElement.getElementsByTagName("friend").item(0).getTextContent();
+                    String requestDetails = requestElement.getElementsByTagName("requestDetails").item(0).getTextContent();
+                    // Agregar el nombre del amigo y detalles de la solicitud a la lista
+                    if (driverUsername.equals(friend)) {
+                        driverFriendships.add(friend + " - Request Details: " + requestDetails);
+                    }
+                }
+            }
+
+            // Obtener las relaciones de amistad
+            doc = builder.parse(new File("friendships.xml"));
+
+            NodeList friendshipNodes = doc.getElementsByTagName("friendship");
+            for (int i = 0; i < friendshipNodes.getLength(); i++) {
+                Node friendshipNode = friendshipNodes.item(i);
+                if (friendshipNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element friendshipElement = (Element) friendshipNode;
+                    String friend = friendshipElement.getElementsByTagName("friend").item(0).getTextContent();
+                    String requestDetails = friendshipElement.getElementsByTagName("requestDetails").item(0).getTextContent();
+                    // Agregar el nombre del amigo y detalles de la solicitud a la lista
+                    if (driverUsername.equals(friend)) {
+                        driverFriendships.add(friend + " - Request Details: " + requestDetails);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Manejar la excepción según tus necesidades
+        }
+
+        return driverFriendships;
     }
 
     private static boolean checkUserExists(String username) {
@@ -123,11 +204,13 @@ public class Server {
             e.printStackTrace();
         }
     }
-    private static void storeFriendship(String driverUsername, String friendUsername) {
+    // Modificar el método storeFriendship
+    private static void storeFriendship(String driverUsername, String friendUsername, String requestDetails) {
         try (FileWriter writer = new FileWriter("friendships.xml", true)) {
-            // Formato simple de XML para almacenar las relaciones de amistad
-            String xmlData = String.format("<friendship><driver>%s</driver><friend>%s</friend></friendship>%n",
-                    driverUsername, friendUsername);
+            // Formato XML para almacenar las relaciones de amistad con detalles de solicitud
+            String xmlData = String.format(
+                    "<friendship><driver>%s</driver><friend>%s</friend><requestDetails>%s</requestDetails></friendship>%n",
+                    driverUsername, friendUsername, requestDetails);
 
             // Escribir la información en el archivo
             writer.write(xmlData);
@@ -138,6 +221,7 @@ public class Server {
             // Manejar la excepción según tus necesidades
         }
     }
+
     private static boolean checkCredentials(String username, String password) {
         try {
             String fileName = username + "_userData.xml";

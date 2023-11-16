@@ -6,6 +6,7 @@ import org.json.XML;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class Server {
 
@@ -54,8 +55,25 @@ public class Server {
                 writer.newLine();
                 writer.flush();
             } else if ("LOGIN".equals(operationType)) {
-                // Lógica para el inicio de sesión aquí
-                // Puedes adaptar según tus necesidades
+                // Leer el JSON con la información de inicio de sesión
+                String jsonLoginData = reader.readLine();
+                JSONObject loginData = new JSONObject(jsonLoginData);
+
+                // Obtener los campos del JSON
+                String username = loginData.getString("username");
+                String password = loginData.getString("password");
+
+                // Verificar las credenciales
+                boolean loginSuccessful = checkCredentials(username, password);
+
+                // Enviar resultado al cliente
+                if (loginSuccessful) {
+                    writer.write("Login successful");
+                } else {
+                    writer.write("Login failed");
+                }
+                writer.newLine();
+                writer.flush();
             } else {
                 System.out.println("Unsupported operation type");
             }
@@ -67,12 +85,34 @@ public class Server {
             e.printStackTrace();
         }
     }
+    private static boolean checkCredentials(String username, String password) {
+        try {
+            String fileName = username + "_userData.xml";
+            File file = new File(fileName);
+
+            if (file.exists()) {
+                // Lee el contenido del archivo XML y compara las credenciales
+                String xmlData = new String(Files.readAllBytes(file.toPath()));
+                JSONObject userData = XML.toJSONObject(xmlData);
+
+                String storedUsername = userData.getString("username");
+                String storedPassword = userData.getString("password");
+
+                return username.equals(storedUsername) && password.equals(storedPassword);
+            } else {
+                return false; // El usuario no existe
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     private static void saveUserDataAsXML(String username, String password, String employeeId, String location) {
         // Crea un objeto JSON con la información del usuario
         JSONObject userData = new JSONObject();
         userData.put("username", username);
-        userData.put("password", password);
+        userData.put("password", password); // Asegúrate de que password sea siempre una cadena
         userData.put("employeeId", employeeId);
         userData.put("location", location);
 
@@ -80,13 +120,13 @@ public class Server {
         String xmlData = XML.toString(userData);
 
         // Guarda la cadena XML en un archivo en el sistema de archivos del servidor
-        String fileName = username + "_userData.xml"; // Puedes ajustar el nombre del archivo según tus necesidades
+        String fileName = username + "_userData.xml";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(xmlData);
             System.out.println("User data saved to: " + fileName);
         } catch (IOException e) {
             e.printStackTrace();
-            // Aquí puedes manejar la excepción según tus necesidades, por ejemplo, registrando el error
+            // Maneja la excepción según tus necesidades
         }
     }
 }

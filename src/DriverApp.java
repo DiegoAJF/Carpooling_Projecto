@@ -2,9 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.json.JSONObject;
+import java.io.*;
+import java.net.Socket;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class DriverApp extends JFrame {
-    private JComboBox<String> transportationComboBox;
 
     public DriverApp(String username) {
         setTitle("Welcome, " + username + "!");
@@ -12,10 +16,6 @@ public class DriverApp extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Centra la ventana en la pantalla
 
-        // Crear y agregar JComboBox en la parte inferior
-        String[] transportationOptions = {"Friend", "Driver"};
-        transportationComboBox = new JComboBox<>(transportationOptions);
-        add(transportationComboBox, BorderLayout.SOUTH);
 
         // Crear JMenuBar
         JMenuBar menuBar = new JMenuBar();
@@ -34,18 +34,34 @@ public class DriverApp extends JFrame {
         });
 
         // Crear JMenuItem "View Friendships with Drivers"
-        JMenuItem viewFriendshipsItem = new JMenuItem("View Friendships with Drivers");
+        JMenuItem viewFriendshipsItem = new JMenuItem("View Friendships with Employees");
         viewFriendshipsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Lógica para visualizar relaciones de amistad con conductores
-                JOptionPane.showMessageDialog(DriverApp.this, "Viewing Friendships with Drivers");
+                JOptionPane.showMessageDialog(DriverApp.this, "Viewing Friendships with Employees");
             }
         });
+
+        // Crear JMenuItem "Add Friends"
+        JMenuItem addFriendsItem = new JMenuItem("Add Friends");
+        addFriendsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Lógica para añadir amigos
+                String friendName = JOptionPane.showInputDialog(DriverApp.this, "Enter friend's name:");
+                if (friendName != null) {
+                    // Enviar solicitud de amistad al servidor usando JSON
+                    sendFriendRequest(username, friendName);
+                }
+            }
+        });
+
 
         // Agregar los JMenuItem al JMenu
         optionsMenu.add(viewRatingItem);
         optionsMenu.add(viewFriendshipsItem);
+        optionsMenu.add(addFriendsItem);
 
         // Agregar el JMenu al JMenuBar
         menuBar.add(optionsMenu);
@@ -56,9 +72,33 @@ public class DriverApp extends JFrame {
         setVisible(true);
     }
 
-    // Agrega un método para obtener la opción seleccionada en el JComboBox
-    public String getTransportationOption() {
-        return (String) transportationComboBox.getSelectedItem();
-    }
+    // Método para enviar la solicitud de amistad al servidor
+    private void sendFriendRequest(String driverUsername, String friendUsername) {
+        try (Socket socket = new Socket("localhost", 12345);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
+            // Crear un objeto JSON con la información de la solicitud de amistad
+            JSONObject friendRequestData = new JSONObject();
+            friendRequestData.put("operationType", "FRIEND_REQUEST");
+            friendRequestData.put("driverUsername", driverUsername);
+            friendRequestData.put("friendUsername", friendUsername);
+
+            // Enviar la solicitud de amistad al servidor
+            writer.write("FRIEND_REQUEST");
+            writer.newLine();
+            writer.write(friendRequestData.toString());
+            writer.newLine();
+            writer.flush();
+
+            // Leer la respuesta del servidor
+            String response = reader.readLine();
+
+            // Muestra la respuesta en un cuadro de diálogo
+            JOptionPane.showMessageDialog(DriverApp.this, response);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

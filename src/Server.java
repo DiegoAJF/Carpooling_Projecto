@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
+
 public class Server {
 
     private static final int PORT = 12345;
@@ -26,6 +27,39 @@ public class Server {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void handleFriendRequest(BufferedReader reader, BufferedWriter writer) throws IOException {
+        // Lógica para manejar la solicitud de amistad
+        String jsonFriendRequestData = reader.readLine();
+        JSONObject friendRequestData = new JSONObject(jsonFriendRequestData);
+
+        // Obtener los campos del JSON
+        String driverUsername = friendRequestData.getString("driverUsername");
+        String friendUsername = friendRequestData.getString("friendUsername");
+
+        // Verificar la solicitud de amistad y enviar la respuesta al cliente
+        if (checkUserExists(driverUsername) && checkUserExists(friendUsername)) {
+            // Aquí puedes implementar la lógica para almacenar la relación de amistad
+            // Puedes guardar esta información en un archivo XML o en otro formato según tus necesidades
+            // Por ahora, simplemente enviamos una respuesta al cliente
+            writer.write("Friend request sent to " + friendUsername);
+        } else {
+            writer.write("User not found: " + friendUsername);
+        }
+        writer.newLine();
+        writer.flush();
+    }
+
+    private static boolean checkUserExists(String username) {
+        try {
+            String fileName = username + "_userData.xml";
+            File file = new File(fileName);
+            return file.exists();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -74,6 +108,10 @@ public class Server {
                 }
                 writer.newLine();
                 writer.flush();
+
+            } else if ("FRIEND_REQUEST".equals(operationType)) {
+                // Lógica para manejar la solicitud de amistad
+                handleFriendRequest(reader, writer);
             } else {
                 System.out.println("Unsupported operation type");
             }
@@ -83,6 +121,21 @@ public class Server {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    private static void storeFriendship(String driverUsername, String friendUsername) {
+        try (FileWriter writer = new FileWriter("friendships.xml", true)) {
+            // Formato simple de XML para almacenar las relaciones de amistad
+            String xmlData = String.format("<friendship><driver>%s</driver><friend>%s</friend></friendship>%n",
+                    driverUsername, friendUsername);
+
+            // Escribir la información en el archivo
+            writer.write(xmlData);
+            System.out.println(driverUsername + " and " + friendUsername + " are now friends.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Manejar la excepción según tus necesidades
         }
     }
     private static boolean checkCredentials(String username, String password) {

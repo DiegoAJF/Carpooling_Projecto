@@ -84,6 +84,9 @@ public class EmployeeAppInterface extends JFrame {
                 registrationData.put("employeeId", employeeId);
                 registrationData.put("location", location);
 
+                // Agrega el campo "userType" con el valor "employee"
+                registrationData.put("userType", "employee");
+
                 try (Socket socket = new Socket("localhost", 12345); // Cambia "localhost" por la IP del servidor
                      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))
                 ) {
@@ -95,9 +98,6 @@ public class EmployeeAppInterface extends JFrame {
                     writer.write(registrationData.toString());
                     writer.newLine();
                     writer.flush();
-
-                    // Aquí puedes leer la respuesta del servidor si es necesario
-                    // También puedes cerrar la conexión si ya no necesitas enviar más datos
 
                 } catch (IOException ex) {
                     ex.printStackTrace();

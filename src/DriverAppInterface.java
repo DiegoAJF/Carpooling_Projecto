@@ -10,7 +10,7 @@ import java.io.IOException;
 public class DriverAppInterface extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JTextField driverIdField;
+    private JTextField employeeIdField;
     private JComboBox<String> locationComboBox;
 
     public DriverAppInterface() {
@@ -49,9 +49,9 @@ public class DriverAppInterface extends JFrame {
         passwordField.setBounds(150, 80, 150, 20);
         add(passwordField);
 
-        driverIdField = new JTextField();
-        driverIdField.setBounds(150, 110, 150, 20);
-        add(driverIdField);
+        employeeIdField = new JTextField();
+        employeeIdField.setBounds(150, 110, 150, 20);
+        add(employeeIdField);
 
         String[] locations = {"Location A", "Location B", "Location C"};
         locationComboBox = new JComboBox<>(locations);
@@ -74,7 +74,7 @@ public class DriverAppInterface extends JFrame {
                 String username = usernameField.getText();
                 char[] passwordChars = passwordField.getPassword();
                 String password = new String(passwordChars);
-                String employeeId = driverIdField.getText();
+                String employeeId = employeeIdField.getText();
                 String location = (String) locationComboBox.getSelectedItem();
 
                 // Crea un objeto JSON con la información del registro
@@ -83,6 +83,9 @@ public class DriverAppInterface extends JFrame {
                 registrationData.put("password", password);
                 registrationData.put("employeeId", employeeId);
                 registrationData.put("location", location);
+
+                // Agrega el campo "userType" con el valor "employee"
+                registrationData.put("userType", "Driver");
 
                 try (Socket socket = new Socket("localhost", 12345); // Cambia "localhost" por la IP del servidor
                      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))
@@ -95,9 +98,6 @@ public class DriverAppInterface extends JFrame {
                     writer.write(registrationData.toString());
                     writer.newLine();
                     writer.flush();
-
-                    // Aquí puedes leer la respuesta del servidor si es necesario
-                    // También puedes cerrar la conexión si ya no necesitas enviar más datos
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -142,7 +142,7 @@ public class DriverAppInterface extends JFrame {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                new EmployeeApp(username).setVisible(true);
+                                new DriverApp(username).setVisible(true);
                             }
                         });
 

@@ -1,18 +1,12 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.json.JSONObject;
-import java.io.*;
-import java.net.Socket;
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 public class DriverApp extends JFrame {
 
-    private String username; // Agrega esta línea para declarar la variable username
 
     public DriverApp(String username) {
-        this.username = username; // Agrega esta línea para asignar el valor del parámetro al campo de la clase
         setTitle("Welcome, " + username + "!");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,12 +46,12 @@ public class DriverApp extends JFrame {
                 // Lógica para añadir amigos
                 String friendName = JOptionPane.showInputDialog(DriverApp.this, "Enter friend's name:");
                 if (friendName != null) {
-                    // Enviar solicitud de amistad al servidor usando JSON
-                    sendFriendRequest(friendName);
+                    // Aquí puedes realizar acciones con el nombre del amigo
+                    // Por ejemplo, mostrar un mensaje con el nombre
+                    JOptionPane.showMessageDialog(DriverApp.this, "Friend added: " + friendName);
                 }
             }
         });
-
 
         // Agregar los JMenuItem al JMenu
         optionsMenu.add(viewRatingItem);
@@ -73,29 +67,13 @@ public class DriverApp extends JFrame {
         setVisible(true);
     }
 
-    // Método para enviar la solicitud de amistad al servidor
-// Reemplaza el método sendFriendRequest con este código:
-
-    // Método para enviar la solicitud de amistad al servidor
-// Reemplaza el método sendFriendRequest con este código:
-    private void sendFriendRequest(String friendUsername) {
-        try (Socket socket = new Socket("localhost", 12345);
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            // Obtener detalles adicionales de la solicitud (opcional)
-            String requestDetails = JOptionPane.showInputDialog(DriverApp.this, "Enter details for the friend request (optional):");
-
-            // Crear un objeto JSON con la información de la solicitud de amistad
-            JSONObject friendRequestData = new JSONObject();
-            friendRequestData.put("operationType", "FRIEND_REQUEST");
-            friendRequestData.put("driverUsername", username);  // Utiliza el campo de la clase
-            friendRequestData.put("friendUsername", friendUsername);
-            friendRequestData.put("requestDetails", requestDetails);  // Agregar detalles de la solicitud
-
-            // Resto del código...
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    public static void main(String[] args) {
+        // Ejemplo de uso
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new DriverApp("Driver123").setVisible(true);
+            }
+        });
     }
 }

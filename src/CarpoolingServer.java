@@ -349,7 +349,9 @@ public class CarpoolingServer {
             return ruta;
         }
     }
-
+    /**
+     * Represents a point on the map with coordinates and connections to other points.
+     */
     private static class Punto {
         private String nombre;
         private int x, y;

@@ -7,12 +7,20 @@ import java.net.Socket;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+/**
+ * Clase que representa la interfaz de la aplicación EmployeeApp.
+ * Permite a los empleados realizar operaciones de inicio de sesión y registro.
+ */
 public class EmployeeAppInterface extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JTextField employeeIdField;
     private JComboBox<String> locationComboBox;
 
+    /**
+     * Constructor de la interfaz de la aplicación EmployeeApp.
+     * Configura y muestra la interfaz gráfica.
+     */
     public EmployeeAppInterface() {
         // Configuración de la interfaz
         setTitle("EmployeeApp");
@@ -53,7 +61,6 @@ public class EmployeeAppInterface extends JFrame {
         employeeIdField.setBounds(150, 110, 150, 20);
         add(employeeIdField);
 
-        // Change to hold 30 numeric locations
         String[] locations = new String[30];
         for (int i = 1; i <= 30; i++) {
             locations[i - 1] = "Location " + i;
@@ -165,6 +172,11 @@ public class EmployeeAppInterface extends JFrame {
 
     }
 
+    /**
+     * Método principal que inicia la aplicación.
+     * Crea una instancia de la interfaz y la hace visible.
+     * @param args Argumentos de línea de comandos (no se utilizan en este caso).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

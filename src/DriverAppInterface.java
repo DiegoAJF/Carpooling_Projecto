@@ -7,12 +7,20 @@ import java.net.Socket;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+/**
+ * Clase que representa la interfaz de usuario para la aplicación de conductor (DriverApp).
+ * Permite a los usuarios realizar operaciones de inicio de sesión y registro.
+ */
 public class DriverAppInterface extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JTextField employeeIdField;
     private JComboBox<String> locationComboBox;
 
+    /**
+     * Constructor de la interfaz del usuario de DriverApp.
+     * Configura y muestra la interfaz gráfica con campos de inicio de sesión y registro.
+     */
     public DriverAppInterface() {
         // Configuración de la interfaz
         setTitle("DriverApp Login and Registration");
@@ -53,7 +61,11 @@ public class DriverAppInterface extends JFrame {
         employeeIdField.setBounds(150, 110, 150, 20);
         add(employeeIdField);
 
-        String[] locations = {"Location A", "Location B", "Location C"};
+        String[] locations = new String[30];
+        for (int i = 1; i <= 30; i++) {
+            locations[i - 1] = "Location " + i;
+        }
+
         locationComboBox = new JComboBox<>(locations);
         locationComboBox.setBounds(150, 140, 150, 20);
         add(locationComboBox);
@@ -160,6 +172,11 @@ public class DriverAppInterface extends JFrame {
         });
     }
 
+    /**
+     * Método principal que inicia la aplicación DriverAppInterface.
+     * Crea una instancia de la interfaz y la hace visible.
+     * @param args Los argumentos de la línea de comandos (no se utilizan en este caso).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

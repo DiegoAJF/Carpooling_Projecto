@@ -3,10 +3,19 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * La clase EmployeeApp representa una aplicación de empleado con interfaz gráfica.
+ * Permite a los empleados interactuar con un mapa interactivo y realizar diversas acciones.
+ */
 public class EmployeeApp extends JFrame {
     private JComboBox<String> transportationComboBox;
     private MapaInteractivoE mapaInteractivo;
 
+    /**
+     * Constructor de la clase EmployeeApp.
+     *
+     * @param username El nombre de usuario del empleado.
+     */
     public EmployeeApp(String username) {
         setTitle("Welcome, " + username + "!");
         setSize(800, 700);
@@ -36,6 +45,11 @@ public class EmployeeApp extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Obtiene la opción de transporte seleccionada.
+     *
+     * @return La opción de transporte seleccionada.
+     */
     public String getTransportationOption() {
         return (String) transportationComboBox.getSelectedItem();
     }
@@ -45,9 +59,18 @@ public class EmployeeApp extends JFrame {
     }
 }
 
+/**
+ * La clase MapaInteractivoE representa un mapa interactivo con puntos de destino.
+ * Permite generar un mapa con ubicaciones predefinidas.
+ */
 class MapaInteractivoE extends JPanel {
     private Map<String, PuntoE> puntos;
 
+    /**
+     * Constructor de la clase MapaInteractivoE.
+     *
+     * @param numDestinos El número de destinos en el mapa.
+     */
     public MapaInteractivoE(int numDestinos) {
         puntos = new HashMap<>();
         generarMapa(numDestinos);
@@ -78,11 +101,23 @@ class MapaInteractivoE extends JPanel {
     }
 }
 
+/**
+ * La clase PuntoE representa un punto en el mapa interactivo.
+ * Cada punto tiene un nombre, coordenadas y color.
+ */
 class PuntoE {
     private String nombre;
     private int x, y;
     private Color color;
 
+    /**
+     * Constructor de la clase PuntoE.
+     *
+     * @param nombre El nombre del punto.
+     * @param x      La coordenada x del punto.
+     * @param y      La coordenada y del punto.
+     * @param color  El color del punto.
+     */
     public PuntoE(String nombre, int x, int y, Color color) {
         this.nombre = nombre;
         this.x = x;
@@ -90,6 +125,11 @@ class PuntoE {
         this.color = color;
     }
 
+    /**
+     * Dibuja el punto en el componente gráfico dado.
+     *
+     * @param g El objeto Graphics para dibujar el punto.
+     */
     public void dibujar(Graphics g) {
         g.setColor(color);
         g.fillOval(x - 10, y - 10, 20, 20);

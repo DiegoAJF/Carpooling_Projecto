@@ -7,10 +7,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
 
+/**
+ * The `CarpoolingServer` class represents a server for a carpooling application. It handles client connections
+ * and provides functionalities such as user registration, login, map requests, and route planning.
+ */
 public class CarpoolingServer {
     private static final int PORT = 12345;
     private static MapaInteractivo mapa;
 
+    /**
+     * Main method to start the Carpooling server. It initializes the prototype map and listens for incoming client connections.
+     *
+     * @param args Command-line arguments (not used in this application).
+     */
     public static void main(String[] args) {
         gestionarMapaPrototipo();
 
@@ -30,10 +39,18 @@ public class CarpoolingServer {
         }
     }
 
+    /**
+     * Initializes the prototype map for the carpooling application.
+     */
     private static void gestionarMapaPrototipo() {
         mapa = new MapaInteractivo(30);
     }
 
+    /**
+     * Handles a client connection by creating a new thread to process the client's request.
+     *
+     * @param clientSocket The socket representing the connection to the client.
+     */
     private static void handleConnection(Socket clientSocket) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
@@ -58,7 +75,13 @@ public class CarpoolingServer {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Handles user registration by reading registration data from the client, saving it, and notifying the client.
+     *
+     * @param reader The BufferedReader for reading data from the client.
+     * @param writer The BufferedWriter for writing data to the client.
+     * @throws IOException If an I/O error occurs.
+     */
     private static void handleRegistration(BufferedReader reader, BufferedWriter writer) throws IOException {
         String jsonRegistrationData = reader.readLine();
         JSONObject registrationData = new JSONObject(jsonRegistrationData);
@@ -71,7 +94,13 @@ public class CarpoolingServer {
         writer.newLine();
         writer.flush();
     }
-
+    /**
+     * Handles user login by reading login data from the client, verifying credentials, and notifying the client.
+     *
+     * @param reader The BufferedReader for reading data from the client.
+     * @param writer The BufferedWriter for writing data to the client.
+     * @throws IOException If an I/O error occurs.
+     */
     private static void handleLogin(BufferedReader reader, BufferedWriter writer) throws IOException {
         String jsonLoginData = reader.readLine();
         JSONObject loginData = new JSONObject(jsonLoginData);
@@ -86,7 +115,13 @@ public class CarpoolingServer {
         writer.newLine();
         writer.flush();
     }
-
+    /**
+     * Handles a route request by reading route data from the client, finding the shortest route, and sending it to the client.
+     *
+     * @param reader The BufferedReader for reading data from the client.
+     * @param writer The BufferedWriter for writing data to the client.
+     * @throws IOException If an I/O error occurs.
+     */
     private static void handleRouteRequest(BufferedReader reader, BufferedWriter writer) throws IOException {
         String jsonRouteData = reader.readLine();
         JSONObject routeData = new JSONObject(jsonRouteData);
@@ -104,6 +139,12 @@ public class CarpoolingServer {
         }
     }
 
+    /**
+     * Sends the interactive map to the client in JSON format.
+     *
+     * @param writer The BufferedWriter for writing data to the client.
+     * @throws IOException If an I/O error occurs.
+     */
     private static void enviarMapaAlCliente(BufferedWriter writer) throws IOException {
         JSONObject mapaJSON = new JSONObject();
         for (Punto punto : mapa.getPuntos().values()) {
@@ -118,7 +159,13 @@ public class CarpoolingServer {
         writer.newLine();
         writer.flush();
     }
-
+    /**
+     * Sends the calculated route to the client in JSON format.
+     *
+     * @param writer The BufferedWriter for writing data to the client.
+     * @param ruta   The list of points representing the calculated route.
+     * @throws IOException If an I/O error occurs.
+     */
     private static void enviarRutaAlCliente(BufferedWriter writer, List<Punto> ruta) throws IOException {
         JSONObject rutaJSON = new JSONObject();
         JSONArray puntosArray = new JSONArray();
@@ -137,7 +184,13 @@ public class CarpoolingServer {
         writer.newLine();
         writer.flush();
     }
-
+    /**
+     * Checks user credentials by comparing the provided username and password with stored data.
+     *
+     * @param username The username provided by the client.
+     * @param password The password provided by the client.
+     * @return True if the credentials are valid, false otherwise.
+     */
     private static boolean checkCredentials(String username, String password) {
         try {
             String fileName = username + "_userData.xml";
@@ -157,7 +210,14 @@ public class CarpoolingServer {
             return false;
         }
     }
-
+    /**
+     * Saves user registration data as an XML file.
+     *
+     * @param username   The username provided during registration.
+     * @param password   The password provided during registration.
+     * @param employeeId The employee ID provided during registration.
+     * @param location   The location provided during registration.
+     */
     private static void saveUserDataAsXML(String username, String password, String employeeId, String location) {
         JSONObject userData = new JSONObject();
         userData.put("username", username);
@@ -175,7 +235,9 @@ public class CarpoolingServer {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Represents an interactive map for the carpooling application, containing points and connections.
+     */
     private static class MapaInteractivo {
         private Map<String, Punto> puntos;
 

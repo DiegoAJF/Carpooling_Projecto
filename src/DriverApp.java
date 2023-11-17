@@ -9,7 +9,7 @@ public class DriverApp extends JFrame {
 
     public DriverApp(String username) {
         setTitle("Welcome, " + username + "!");
-        setSize(700, 700);
+        setSize(800, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

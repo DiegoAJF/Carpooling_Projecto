@@ -46,7 +46,7 @@ public class EmployeeApp extends JFrame {
 }
 
 class MapaInteractivoE extends JPanel {
-    private Map<String, Punto> puntos;
+    private Map<String, PuntoE> puntos;
 
     public MapaInteractivoE(int numDestinos) {
         puntos = new HashMap<>();
@@ -58,16 +58,22 @@ class MapaInteractivoE extends JPanel {
         int[] posY = {50, 100, 50, 100, 50, 200, 200, 200, 200, 200, 350, 300, 350, 300, 350, 450, 400, 450, 400, 450, 550, 500, 550, 500, 550, 600, 600, 600, 600, 600};
         for (int i = 0; i < numDestinos; i++) {
             String nombre = "Destino " + (i + 1);
-            Punto punto = new Punto(nombre, posX[i], posY[i]);
-            puntos.put(nombre, punto);
+            PuntoE puntoe;
+            if (i == 14) {
+                // Ubicación número 15
+                puntoe = new PuntoE(nombre, posX[i], posY[i], Color.RED);
+            } else {
+                puntoe = new PuntoE(nombre, posX[i], posY[i], Color.BLUE);
+            }
+            puntos.put(nombre, puntoe);
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (Punto punto : puntos.values()) {
-            punto.dibujar(g);
+        for (PuntoE puntoe : puntos.values()) {
+            puntoe.dibujar(g);
         }
     }
 }
@@ -75,17 +81,19 @@ class MapaInteractivoE extends JPanel {
 class PuntoE {
     private String nombre;
     private int x, y;
+    private Color color;
 
-    public PuntoE(String nombre, int x, int y) {
+    public PuntoE(String nombre, int x, int y, Color color) {
         this.nombre = nombre;
         this.x = x;
         this.y = y;
+        this.color = color;
     }
 
     public void dibujar(Graphics g) {
-        g.setColor(Color.BLUE);
+        g.setColor(color);
         g.fillOval(x - 10, y - 10, 20, 20);
-        g.setColor(Color.BLACK);
+        g.setColor(Color.RED);
         g.drawString(nombre, x - 10, y - 20);
     }
 }

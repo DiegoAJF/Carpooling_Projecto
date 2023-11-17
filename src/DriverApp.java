@@ -62,25 +62,33 @@ public class DriverApp extends JFrame {
 }
 
 class MapaInteractivo extends JPanel {
-
     private Map<String, Punto> puntos;
+    private BloqueNegro bloqueNegro;
 
     public MapaInteractivo(int numDestinos) {
         puntos = new HashMap<>();
+        bloqueNegro = new BloqueNegro(0, 0); // Inicializar en (0, 0)
         generarMapa(numDestinos);
     }
 
     private void generarMapa(int numDestinos) {
-        // Crear posiciones caóticas para los destinos
         int[] posX = {80, 180, 280, 380, 480, 120, 220, 320, 420, 520, 80, 180, 280, 380, 480, 120, 220, 320, 420, 520, 80, 180, 280, 380, 480, 120, 220, 320, 420, 520};
         int[] posY = {50, 100, 50, 100, 50, 200, 200, 200, 200, 200, 350, 300, 350, 300, 350, 450, 400, 450, 400, 450, 550, 500, 550, 500, 550, 600, 600, 600, 600, 600};
 
-        // Crear puntos (destinos) con posiciones caóticas
         for (int i = 0; i < numDestinos; i++) {
             String nombre = "Destino " + (i + 1);
-            Punto punto = new Punto(nombre, posX[i] + getRandomVariation(), posY[i] + getRandomVariation());
+            Punto punto;
+            if (i == 14) {
+                punto = new Punto(nombre, posX[i] + getRandomVariation(), posY[i] + getRandomVariation(), true);
+            } else {
+                punto = new Punto(nombre, posX[i] + getRandomVariation(), posY[i] + getRandomVariation(), false);
+            }
             puntos.put(nombre, punto);
         }
+
+        // Crear el cuadrado negro en un punto aleatorio
+        int randomIndex = (int) (Math.random() * numDestinos);
+        bloqueNegro = new BloqueNegro(posX[randomIndex] + getRandomVariation(), posY[randomIndex] + getRandomVariation());
     }
 
     private int getRandomVariation() {
@@ -95,24 +103,47 @@ class MapaInteractivo extends JPanel {
         for (Punto punto : puntos.values()) {
             punto.dibujar(g);
         }
+
+        // Dibujar el cuadrado negro
+        bloqueNegro.dibujar(g);
     }
 }
 
 class Punto {
     private String nombre;
     private int x, y;
+    private boolean esUbicacion15;
 
-    public Punto(String nombre, int x, int y) {
+    public Punto(String nombre, int x, int y, boolean esUbicacion15) {
         this.nombre = nombre;
+        this.x = x;
+        this.y = y;
+        this.esUbicacion15 = esUbicacion15;
+    }
+
+    public void dibujar(Graphics g) {
+        // Dibujar el punto
+        if (esUbicacion15) {
+            g.setColor(Color.RED); // Cambiar color para la ubicación número 15
+        } else {
+            g.setColor(Color.BLUE);
+        }
+        g.fillOval(x - 10, y - 10, 20, 20);
+        g.setColor(Color.BLACK);
+        g.drawString(nombre, x - 10, y - 20);
+    }
+}
+
+class BloqueNegro {
+    private int x, y;
+
+    public BloqueNegro(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public void dibujar(Graphics g) {
-        // Dibujar el punto
-        g.setColor(Color.BLUE);
-        g.fillOval(x - 10, y - 10, 20, 20);
         g.setColor(Color.BLACK);
-        g.drawString(nombre, x - 10, y - 20);
+        g.fillRect(x, y, 20, 20); // Puedes ajustar el tamaño del cuadrado según tus preferencias
     }
 }

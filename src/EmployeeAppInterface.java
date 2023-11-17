@@ -53,7 +53,12 @@ public class EmployeeAppInterface extends JFrame {
         employeeIdField.setBounds(150, 110, 150, 20);
         add(employeeIdField);
 
-        String[] locations = {"Location A", "Location B", "Location C"};
+        // Change to hold 30 numeric locations
+        String[] locations = new String[30];
+        for (int i = 1; i <= 30; i++) {
+            locations[i - 1] = "Location " + i;
+        }
+
         locationComboBox = new JComboBox<>(locations);
         locationComboBox.setBounds(150, 140, 150, 20);
         add(locationComboBox);
